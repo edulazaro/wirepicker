@@ -29,6 +29,9 @@ class Picker extends Component
     /** @var array<string, string> Y-m-d => what the day holds ('' for a bare mark). */
     public array $marked = [];
 
+    /** @var array<string, string> Y-m-d => why it cannot be picked ('' for no reason given). */
+    public array $disabledDates = [];
+
     public string $locale;
 
     /** @var list<string> */
@@ -52,6 +55,9 @@ class Picker extends Component
      * @param  string|null  $defaultTime  With `time`, the time a day gets before one is chosen (H:i, 09:00 by default).
      * @param  array<int|string, mixed>|null  $marked  Days that already hold something, marked with a dot: a list of
      *                                               Y-m-d, or Y-m-d => a title (or a list of them) shown on hover.
+     * @param  bool  $disableWeekends  Saturdays and Sundays cannot be picked.
+     * @param  array<int|string, mixed>|null  $disabledDates  Days that cannot be picked: Y-m-d, or Y-m-d => why.
+     * @param  bool  $allowUnavailable  Weekends and disabled dates are painted unavailable but can still be picked.
      */
     public function __construct(
         public bool $range = false,
@@ -70,6 +76,9 @@ class Picker extends Component
         public int $step = 15,
         public ?string $defaultTime = null,
         ?array $marked = null,
+        public bool $disableWeekends = false,
+        ?array $disabledDates = null,
+        public bool $allowUnavailable = false,
     ) {
         $this->locale = str_replace('_', '-', $locale ?? app()->getLocale());
         // Each mode keeps its own shortcuts; an unknown one is dropped, not drawn dead.
@@ -77,11 +86,12 @@ class Picker extends Component
             ? in_array($preset, self::PRESETS, true)
             : in_array($preset, self::SINGLE_PRESETS, true) || preg_match(self::OFFSET, $preset))));
         $this->marked = self::marks($marked ?? []);
+        $this->disabledDates = self::marks($disabledDates ?? []);
     }
 
     /**
-     * `marked` as Y-m-d => title, whatever shape it came in; anything that is not a date is
-     * left out.
+     * `marked` or `disabledDates` as Y-m-d => title, whatever shape it came in; anything that
+     * is not a date is left out.
      *
      * @param  array<int|string, mixed>  $marked
      * @return array<string, string>
@@ -154,6 +164,7 @@ class Picker extends Component
             'done' => __('wirepicker::picker.done', [], $this->locale),
             'choose-month' => __('wirepicker::picker.choose-month', [], $this->locale),
             'choose-year' => __('wirepicker::picker.choose-year', [], $this->locale),
+            'unavailable' => __('wirepicker::picker.unavailable', [], $this->locale),
             'presets' => array_combine(
                 $this->presets,
                 array_map(fn (string $preset) => $this->presetLabel($preset), $this->presets),

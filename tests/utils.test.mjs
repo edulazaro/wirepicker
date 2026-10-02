@@ -9,7 +9,7 @@ const window = { addEventListener: noop };
 const document = { readyState: 'complete', addEventListener: noop, querySelectorAll: () => [], documentElement: { lang: 'es' } };
 vm.runInNewContext(readFileSync(new URL('../resources/js/wirepicker.js', import.meta.url), 'utf8'), { window, document, Intl, Date, requestAnimationFrame: noop });
 
-const { parse, parseValue, times, toIso, grid, presetRange, presetDate, addMonthsClamped, weekStartFor } = window.Wirepicker.utils;
+const { parse, parseValue, times, toIso, grid, presetRange, presetDate, addMonthsClamped, unavailable, firstAvailable, weekStartFor } = window.Wirepicker.utils;
 
 test('parses only real Y-m-d dates', () => {
     assert.equal(toIso(parse('2026-10-08')), '2026-10-08');
@@ -82,4 +82,21 @@ test("a single date's shortcuts count from the given day", () => {
     assert.equal(toIso(presetDate('+2w', from)), '2027-02-14');
     assert.equal(toIso(presetDate('+1y', from)), '2028-01-31');
     assert.equal(presetDate('this-month', from), null);
+});
+
+test('weekends and disabled dates are unavailable, with their reason', () => {
+    const rules = { disableWeekends: true, disabled: { '2026-12-08': 'Inmaculada', '2026-12-07': '' } };
+
+    assert.equal(unavailable(new Date(2026, 11, 5), rules), ''); // Saturday
+    assert.equal(unavailable(new Date(2026, 11, 8), rules), 'Inmaculada');
+    assert.equal(unavailable(new Date(2026, 11, 9), rules), null);
+    assert.equal(unavailable(new Date(2026, 11, 5), { disableWeekends: false, disabled: {} }), null);
+});
+
+test('the first available day skips weekends and disabled dates', () => {
+    const rules = { disableWeekends: true, disabled: { '2026-12-07': '', '2026-12-08': 'Inmaculada' } };
+
+    // Saturday 5 December: Sunday, then Monday 7 and Tuesday 8 are off, Wednesday 9 is not.
+    assert.equal(toIso(firstAvailable(new Date(2026, 11, 5), rules)), '2026-12-09');
+    assert.equal(toIso(firstAvailable(new Date(2026, 11, 9), rules)), '2026-12-09');
 });

@@ -381,6 +381,23 @@
     background: var(--wp-accent-text);
 }
 
+/* A weekend or a disabled date: hatched and muted, so it reads as "not a working day", not
+   as out of reach like a day past min or max. Blocked, its number is struck through too. */
+.wp-day.wp-unavailable {
+    background-image: repeating-linear-gradient(135deg, transparent 0 4px, color-mix(in srgb, var(--wp-text) 8%, transparent) 4px 5px);
+    color: var(--wp-text-muted) !important;
+}
+
+.wp-day.wp-unavailable:disabled {
+    opacity: 1;
+    text-decoration: line-through;
+}
+
+.wp-day.wp-unavailable.wp-selected {
+    background-image: none;
+    color: var(--wp-accent-text) !important;
+}
+
 .wp-day:disabled {
     opacity: 0.3;
     cursor: not-allowed;

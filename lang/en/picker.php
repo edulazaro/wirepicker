@@ -13,6 +13,7 @@ return [
     'done' => 'Done',
     'choose-month' => 'Pick a month',
     'choose-year' => 'Pick a year',
+    'unavailable' => 'Unavailable',
     'presets' => [
         'today' => 'Today',
         'this-week' => 'This week',

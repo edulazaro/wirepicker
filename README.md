@@ -69,6 +69,18 @@ Named ones are `today`, `tomorrow`, `in-a-week` and `in-a-month`; any offset wor
 
 The calendar's title is a button: it shows the year's twelve months, and the year shows twelve years, so a birth date in 1975 is a few clicks away, not six hundred. Picking a year shows its months, picking a month its days. With `min` or `max`, months and years outside them are disabled.
 
+## Unavailable days
+
+Weekends and given dates can be made unavailable, for anything that only happens on working days:
+
+```blade
+<x-wirepicker wire:model="dueOn" disable-weekends :disabled-dates="$holidays" />
+```
+
+`disabled-dates` takes a list of `Y-m-d` dates, or `Y-m-d` => the reason, shown on hover (`['2026-12-08' => 'Inmaculada']`). Unavailable days are hatched and muted, and when blocked their number is struck through, so they read apart from days past `min` or `max`. With `allow-unavailable` they are only painted, and can still be picked, for the urgent case that does happen on a Sunday. A single date's shortcut that lands on one moves on to the next available day, the way a deadline falling on a holiday moves to the next working day. A range may run across unavailable days; only its ends must be available.
+
+The picker paints and blocks; it does not enforce. A rule like "this deadline cannot fall on a holiday" still belongs in the server's validation, since a value can arrive by other ways than a click.
+
 ## Marking busy days
 
 Days that already hold something get a dot under their number, and a title on hover:
@@ -124,6 +136,9 @@ Every change fires `wirepicker:change` on the root, bubbling:
 | `range` | `false` | Two dates instead of one |
 | `presets` | `[]` | Shortcuts beside the calendar: a range's, or a single date's |
 | `marked` | none | Days with a dot: Y-m-d, or Y-m-d => title |
+| `disable-weekends` | `false` | Saturdays and Sundays cannot be picked |
+| `disabled-dates` | none | Days that cannot be picked: Y-m-d, or Y-m-d => reason |
+| `allow-unavailable` | `false` | Unavailable days are painted but can be picked |
 | `placeholder` | translated | Text while empty |
 | `min` / `max` | none | First and last date that can be picked, `Y-m-d` |
 | `clearable` | `true` | A button to empty it |

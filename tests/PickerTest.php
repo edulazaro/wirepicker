@@ -168,4 +168,17 @@ class PickerTest extends TestCase
         $this->assertStringContainsString('data-wp-marked="{&quot;2026-10-08&quot;:&quot;&quot;,&quot;2026-10-09&quot;:&quot;&quot;}"', $bare);
         $this->assertStringNotContainsString('data-wp-marked', $this->render('<x-wirepicker wire:model="startsOn" />'));
     }
+
+    public function test_weekends_and_dates_can_be_unavailable(): void
+    {
+        $plain = $this->render('<x-wirepicker wire:model="dueOn" />');
+        $html = $this->render(<<<'BLADE'
+            <x-wirepicker wire:model="dueOn" disable-weekends :disabled-dates="['2026-12-08' => 'Inmaculada', '2026-12-25']" allow-unavailable />
+            BLADE);
+
+        $this->assertStringNotContainsString('data-wp-disable', $plain);
+        $this->assertStringContainsString('data-wp-disable-weekends', $html);
+        $this->assertStringContainsString('data-wp-disabled="{&quot;2026-12-08&quot;:&quot;Inmaculada&quot;,&quot;2026-12-25&quot;:&quot;&quot;}"', $html);
+        $this->assertStringContainsString('data-wp-allow-unavailable', $html);
+    }
 }

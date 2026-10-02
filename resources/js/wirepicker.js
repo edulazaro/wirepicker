@@ -150,6 +150,33 @@
         }
     }
 
+    /**
+     * Why a day cannot be picked, or null if it can: a disabled date (its reason, or '') or a
+     * weekend. `rules`: { disableWeekends, disabled: { 'Y-m-d': reason } }.
+     */
+    function unavailable(date, rules) {
+        const iso = toIso(date);
+
+        if (rules.disabled && iso in rules.disabled) {
+            return String(rules.disabled[iso] || '');
+        }
+
+        return rules.disableWeekends && (date.getDay() === 0 || date.getDay() === 6) ? '' : null;
+    }
+
+    /** The first day from `date` on that is not unavailable, within a year; null if none. */
+    function firstAvailable(date, rules) {
+        for (let i = 0; i <= 366; i++) {
+            const day = addDays(date, i);
+
+            if (unavailable(day, rules) === null) {
+                return day;
+            }
+        }
+
+        return null;
+    }
+
     const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
 
     /* ---------------------------------------------------------------
@@ -175,6 +202,15 @@
             clearable: root.hasAttribute('data-wp-clearable'),
             time: root.hasAttribute('data-wp-time'),
             step: +root.dataset.wpStep || 15,
+            disableWeekends: root.hasAttribute('data-wp-disable-weekends'),
+            allowUnavailable: root.hasAttribute('data-wp-allow-unavailable'),
+            disabled: (() => {
+                try {
+                    return JSON.parse(root.dataset.wpDisabled || '{}');
+                } catch (e) {
+                    return {};
+                }
+            })(),
             marked: (() => {
                 try {
                     return JSON.parse(root.dataset.wpMarked || '{}');
@@ -295,6 +331,11 @@
         return (!cfg.min || date >= cfg.min) && (!cfg.max || date <= cfg.max);
     }
 
+    /** Within min and max, and not unavailable (unless unavailable days may be picked). */
+    function selectable(date, cfg) {
+        return inRange(date, cfg) && (cfg.allowUnavailable || unavailable(date, cfg) === null);
+    }
+
     function render() {
         if (!open) {
             return;
@@ -332,9 +373,15 @@
             const mark = iso in cfg.marked ? String(cfg.marked[iso] || '') : null;
             if (mark !== null) classes.push('wp-marked');
 
-            const disabled = !inRange(date, cfg);
+            // A weekend or a disabled date: painted apart from what is out of min/max, and
+            // blocked unless unavailable days may be picked.
+            const off = unavailable(date, cfg);
+            if (off !== null) classes.push('wp-unavailable');
 
-            return `<button type="button" class="${classes.join(' ')}" data-wp-day="${iso}"${disabled ? ' disabled' : ''}${mark ? ` title="${escape(mark)}"` : ''} tabindex="-1" aria-pressed="${isStart || isEnd ? 'true' : 'false'}">${date.getDate()}</button>`;
+            const disabled = !selectable(date, cfg);
+            const title = [mark, off !== null ? (off || cfg.labels.unavailable || '') : ''].filter(Boolean).join(' · ');
+
+            return `<button type="button" class="${classes.join(' ')}" data-wp-day="${iso}"${disabled ? ' disabled' : ''}${title ? ` title="${escape(title)}"` : ''} tabindex="-1" aria-pressed="${isStart || isEnd ? 'true' : 'false'}">${date.getDate()}</button>`;
         }).join('');
 
         // The component sends each mode only its own shortcuts.
@@ -493,7 +540,7 @@
     function choose(date) {
         const cfg = config(open.root);
 
-        if (!inRange(date, cfg)) {
+        if (!selectable(date, cfg)) {
             return;
         }
 
@@ -566,7 +613,13 @@
                 const [start, end] = presetRange(preset.dataset.wpPreset, cfg.weekStart);
                 write(open.root, start, end, open.times.start, open.times.end);
             } else {
-                const date = presetDate(preset.dataset.wpPreset);
+                let date = presetDate(preset.dataset.wpPreset);
+
+                // A shortcut that lands on an unavailable day moves on to the next one, the way
+                // a deadline falling on a holiday moves to the next working day.
+                if (date && !cfg.allowUnavailable) {
+                    date = firstAvailable(date, cfg);
+                }
 
                 if (!date || !inRange(date, cfg)) {
                     return;
@@ -707,6 +760,6 @@
         refresh,
         close: hide,
         // The date arithmetic, exposed for tests and for anyone building on it.
-        utils: { parse, parseValue, times, toIso, grid, presetRange, presetDate, addMonthsClamped, weekStartFor },
+        utils: { parse, parseValue, times, toIso, grid, presetRange, presetDate, addMonthsClamped, unavailable, firstAvailable, weekStartFor },
     };
 })();

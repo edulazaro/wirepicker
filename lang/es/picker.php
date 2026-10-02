@@ -13,6 +13,7 @@ return [
     'done' => 'Listo',
     'choose-month' => 'Elegir mes',
     'choose-year' => 'Elegir año',
+    'unavailable' => 'No disponible',
     'presets' => [
         'today' => 'Hoy',
         'this-week' => 'Esta semana',

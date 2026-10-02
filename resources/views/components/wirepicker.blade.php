@@ -12,6 +12,9 @@
      @if ($min) data-wp-min="{{ $min }}" @endif
      @if ($max) data-wp-max="{{ $max }}" @endif
      @if ($clearable) data-wp-clearable @endif
+     @if ($disableWeekends) data-wp-disable-weekends @endif
+     @if ($disabledDates) data-wp-disabled="{{ json_encode($disabledDates, JSON_UNESCAPED_UNICODE) }}" @endif
+     @if ($allowUnavailable) data-wp-allow-unavailable @endif
      @if ($marked) data-wp-marked="{{ json_encode($marked, JSON_UNESCAPED_UNICODE) }}" @endif
      @if ($time) data-wp-time data-wp-step="{{ $step }}" @if ($defaultTime) data-wp-default-time="{{ $defaultTime }}" @endif @endif
      data-wp-labels="{{ json_encode($labels(), JSON_UNESCAPED_UNICODE) }}">
