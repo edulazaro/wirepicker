@@ -119,4 +119,53 @@ class PickerTest extends TestCase
         $this->assertMatchesRegularExpression('/<button[^>]*data-wp-trigger[^>]*id="starts"/', $html);
         $this->assertStringNotContainsString('data-wp-clear', $html);
     }
+
+    public function test_a_time_is_optional_and_carries_its_step(): void
+    {
+        $this->app->setLocale('es');
+
+        $plain = $this->render('<x-wirepicker wire:model="startsOn" />');
+        $timed = $this->render('<x-wirepicker range wire:model="period" time :step="30" default-time="10:00" />');
+
+        $this->assertStringNotContainsString('data-wp-time', $plain);
+        $this->assertStringContainsString('data-wp-time', $timed);
+        $this->assertStringContainsString('data-wp-step="30"', $timed);
+        $this->assertStringContainsString('data-wp-default-time="10:00"', $timed);
+        $this->assertStringContainsString('Listo', $timed);
+        $this->assertStringContainsString('Inicio', $timed);
+    }
+
+    public function test_each_mode_keeps_its_own_shortcuts(): void
+    {
+        $this->app->setLocale('es');
+
+        $single = $this->render(<<<'BLADE'
+            <x-wirepicker wire:model="dueOn" :presets="['today', 'tomorrow', '+3d', '+1m', 'this-month', '+0d', 'nonsense']" />
+            BLADE);
+        $range = $this->render(<<<'BLADE'
+            <x-wirepicker range wire:model="period" :presets="['this-month', 'tomorrow', '+3d']" />
+            BLADE);
+
+        $this->assertStringContainsString('Mañana', $single);
+        $this->assertStringContainsString('Dentro de 3 días', $single);
+        $this->assertStringContainsString('Dentro de 1 mes', $single);
+        $this->assertStringNotContainsString('Este mes', $single);
+        $this->assertStringNotContainsString('+0d', $single);
+        $this->assertStringContainsString('Este mes', $range);
+        $this->assertStringNotContainsString('Mañana', $range);
+    }
+
+    public function test_marked_days_carry_their_titles(): void
+    {
+        $html = $this->render(<<<'BLADE'
+            <x-wirepicker wire:model="startsOn" :marked="['2026-10-08' => 'Visita', '2026-10-14' => ['Llamada', 'Entrega'], 'nonsense' => 'x']" />
+            BLADE);
+        $bare = $this->render(<<<'BLADE'
+            <x-wirepicker wire:model="startsOn" :marked="['2026-10-08', '2026-10-09']" />
+            BLADE);
+
+        $this->assertStringContainsString('data-wp-marked="{&quot;2026-10-08&quot;:&quot;Visita&quot;,&quot;2026-10-14&quot;:&quot;Llamada · Entrega&quot;}"', $html);
+        $this->assertStringContainsString('data-wp-marked="{&quot;2026-10-08&quot;:&quot;&quot;,&quot;2026-10-09&quot;:&quot;&quot;}"', $bare);
+        $this->assertStringNotContainsString('data-wp-marked', $this->render('<x-wirepicker wire:model="startsOn" />'));
+    }
 }

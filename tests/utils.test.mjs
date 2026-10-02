@@ -9,7 +9,7 @@ const window = { addEventListener: noop };
 const document = { readyState: 'complete', addEventListener: noop, querySelectorAll: () => [], documentElement: { lang: 'es' } };
 vm.runInNewContext(readFileSync(new URL('../resources/js/wirepicker.js', import.meta.url), 'utf8'), { window, document, Intl, Date, requestAnimationFrame: noop });
 
-const { parse, toIso, grid, presetRange, weekStartFor } = window.Wirepicker.utils;
+const { parse, parseValue, times, toIso, grid, presetRange, presetDate, addMonthsClamped, weekStartFor } = window.Wirepicker.utils;
 
 test('parses only real Y-m-d dates', () => {
     assert.equal(toIso(parse('2026-10-08')), '2026-10-08');
@@ -45,4 +45,41 @@ test('presets count from the given day', () => {
 test('the first weekday follows the locale', () => {
     assert.equal(weekStartFor('es'), 1);
     assert.equal(weekStartFor('en-US'), 0);
+});
+
+test('a value with a time is read apart, and an impossible time is no time', () => {
+    const value = parseValue('2026-10-08 10:30');
+
+    assert.equal(toIso(value.date), '2026-10-08');
+    assert.equal(value.time, '10:30');
+    assert.equal(parseValue('2026-10-08').time, null);
+    assert.equal(parseValue('2026-10-08 25:00').time, null);
+    assert.equal(parseValue('2026-02-30 10:00').date, null);
+    assert.equal(parseValue('').date, null);
+});
+
+test('the times of a day follow the step', () => {
+    assert.equal(times(15).length, 96);
+    assert.equal(times(15)[1], '00:15');
+    assert.equal(times(30).at(-1), '23:30');
+    assert.equal(times(0).length, 96);
+});
+
+test('a month ahead stays inside the month: 31 January goes to the last of February', () => {
+    assert.equal(toIso(addMonthsClamped(new Date(2027, 0, 31), 1)), '2027-02-28');
+    assert.equal(toIso(addMonthsClamped(new Date(2028, 0, 31), 1)), '2028-02-29');
+    assert.equal(toIso(addMonthsClamped(new Date(2026, 9, 15), 3)), '2027-01-15');
+});
+
+test("a single date's shortcuts count from the given day", () => {
+    const from = new Date(2027, 0, 31);
+
+    assert.equal(toIso(presetDate('today', from)), '2027-01-31');
+    assert.equal(toIso(presetDate('tomorrow', from)), '2027-02-01');
+    assert.equal(toIso(presetDate('in-a-week', from)), '2027-02-07');
+    assert.equal(toIso(presetDate('in-a-month', from)), '2027-02-28');
+    assert.equal(toIso(presetDate('+3d', from)), '2027-02-03');
+    assert.equal(toIso(presetDate('+2w', from)), '2027-02-14');
+    assert.equal(toIso(presetDate('+1y', from)), '2028-01-31');
+    assert.equal(presetDate('this-month', from), null);
 });

@@ -10,13 +10,24 @@ use Illuminate\View\ComponentAttributeBag;
  * A date, or a date range, picked from a calendar.
  *
  * The value lives in hidden inputs, so the picker binds like any input: `wire:model` (a date
- * as `Y-m-d`; a range as an array with `start` and `end`), a plain form field (`name`), or
+ * as `Y-m-d`, or `Y-m-d H:i` with `time`; a range as an array with `start` and `end`), a
+ * plain form field (`name`), or
  * Alpine through the `wirepicker:change` event. The calendar itself is drawn by
  * wirepicker.js, which keeps the package free of any CSS or JS framework.
  */
 class Picker extends Component
 {
+    /** A range's shortcuts. */
     public const PRESETS = ['today', 'this-week', 'next-7-days', 'this-month', 'next-month', 'last-month', 'this-year'];
+
+    /** A single date's shortcuts, besides offsets like `+3d`, `+2w`, `+1m` or `+1y`. */
+    public const SINGLE_PRESETS = ['today', 'tomorrow', 'in-a-week', 'in-a-month'];
+
+    /** An offset shortcut of a single date: a number of days, weeks, months or years ahead. */
+    public const OFFSET = '/^\+([1-9]\d{0,2})([dwmy])$/';
+
+    /** @var array<string, string> Y-m-d => what the day holds ('' for a bare mark). */
+    public array $marked = [];
 
     public string $locale;
 
@@ -36,6 +47,11 @@ class Picker extends Component
      * @param  string|null  $locale  Language of months, days and formats; the app's by default.
      * @param  int|null  $weekStart  0 Sunday … 6 Saturday; the locale's by default.
      * @param  string|null  $id  For a <label for="…">: set on the button that opens it.
+     * @param  bool  $time  A time too: values become `Y-m-d H:i`, chosen under the days.
+     * @param  int  $step  With `time`, the minutes between the times offered.
+     * @param  string|null  $defaultTime  With `time`, the time a day gets before one is chosen (H:i, 09:00 by default).
+     * @param  array<int|string, mixed>|null  $marked  Days that already hold something, marked with a dot: a list of
+     *                                               Y-m-d, or Y-m-d => a title (or a list of them) shown on hover.
      */
     public function __construct(
         public bool $range = false,
@@ -50,9 +66,54 @@ class Picker extends Component
         ?string $locale = null,
         public ?int $weekStart = null,
         public ?string $id = null,
+        public bool $time = false,
+        public int $step = 15,
+        public ?string $defaultTime = null,
+        ?array $marked = null,
     ) {
         $this->locale = str_replace('_', '-', $locale ?? app()->getLocale());
-        $this->presets = array_values(array_intersect($presets, self::PRESETS));
+        // Each mode keeps its own shortcuts; an unknown one is dropped, not drawn dead.
+        $this->presets = array_values(array_filter($presets, fn ($preset) => is_string($preset) && ($range
+            ? in_array($preset, self::PRESETS, true)
+            : in_array($preset, self::SINGLE_PRESETS, true) || preg_match(self::OFFSET, $preset))));
+        $this->marked = self::marks($marked ?? []);
+    }
+
+    /**
+     * `marked` as Y-m-d => title, whatever shape it came in; anything that is not a date is
+     * left out.
+     *
+     * @param  array<int|string, mixed>  $marked
+     * @return array<string, string>
+     */
+    private static function marks(array $marked): array
+    {
+        $marks = [];
+
+        foreach ($marked as $key => $title) {
+            [$date, $title] = is_int($key) ? [$title, ''] : [$key, $title];
+
+            if (is_string($date) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                $marks[$date] = implode(' · ', array_filter(array_map('strval', (array) $title), 'strlen'));
+            }
+        }
+
+        return $marks;
+    }
+
+    /**
+     * A shortcut's words: its own for a named one, built for an offset ("En 3 días").
+     *
+     * @param  string  $preset
+     * @return string
+     */
+    private function presetLabel(string $preset): string
+    {
+        if (preg_match(self::OFFSET, $preset, $offset)) {
+            return trans_choice("wirepicker::picker.in.{$offset[2]}", (int) $offset[1], ['count' => $offset[1]], $this->locale);
+        }
+
+        return __("wirepicker::picker.presets.{$preset}", [], $this->locale);
     }
 
     /**
@@ -87,9 +148,15 @@ class Picker extends Component
             'clear' => __('wirepicker::picker.clear', [], $this->locale),
             'previous' => __('wirepicker::picker.previous', [], $this->locale),
             'next' => __('wirepicker::picker.next', [], $this->locale),
+            'time' => __('wirepicker::picker.time', [], $this->locale),
+            'start-time' => __('wirepicker::picker.start-time', [], $this->locale),
+            'end-time' => __('wirepicker::picker.end-time', [], $this->locale),
+            'done' => __('wirepicker::picker.done', [], $this->locale),
+            'choose-month' => __('wirepicker::picker.choose-month', [], $this->locale),
+            'choose-year' => __('wirepicker::picker.choose-year', [], $this->locale),
             'presets' => array_combine(
                 $this->presets,
-                array_map(fn (string $preset) => __("wirepicker::picker.presets.{$preset}", [], $this->locale), $this->presets),
+                array_map(fn (string $preset) => $this->presetLabel($preset), $this->presets),
             ) ?: (object) [],
         ];
     }

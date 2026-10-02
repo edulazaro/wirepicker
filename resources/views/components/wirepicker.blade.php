@@ -1,5 +1,6 @@
 {{--
-    Hidden fields hold the value (Y-m-d): wire:model, a plain form or Alpine all read them.
+    Hidden fields hold the value (Y-m-d, or Y-m-d H:i with `time`): wire:model, a plain form or
+    Alpine all read them.
     wirepicker.js draws the calendar and writes them back, firing `input` and `change`.
 --}}
 <div {{ $attributes->whereDoesntStartWith('wire:model')->merge(['class' => 'wp-picker']) }}
@@ -11,6 +12,8 @@
      @if ($min) data-wp-min="{{ $min }}" @endif
      @if ($max) data-wp-max="{{ $max }}" @endif
      @if ($clearable) data-wp-clearable @endif
+     @if ($marked) data-wp-marked="{{ json_encode($marked, JSON_UNESCAPED_UNICODE) }}" @endif
+     @if ($time) data-wp-time data-wp-step="{{ $step }}" @if ($defaultTime) data-wp-default-time="{{ $defaultTime }}" @endif @endif
      data-wp-labels="{{ json_encode($labels(), JSON_UNESCAPED_UNICODE) }}">
     @foreach ($range ? ['start', 'end'] : ['start'] as $part)
         {{-- type="text" hidden, not type="hidden": on a hidden input the value IS the attribute,

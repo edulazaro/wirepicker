@@ -234,6 +234,54 @@
     font-weight: 600;
 }
 
+/* The title opens the month and year pickers: a button that reads as the title (the
+   popover's buttons inherit the font, weight included, so it is set again here). */
+.wp-popover .wp-title {
+    font-weight: 600;
+}
+
+.wp-zoom {
+    padding: 4px 8px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+}
+
+.wp-zoom:hover {
+    background: var(--wp-hover);
+}
+
+.wp-cells {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    width: calc(var(--wp-day-size) * 7);
+}
+
+.wp-cell {
+    height: calc(var(--wp-day-size) * 1.4);
+    padding: 0;
+    border: 0;
+    border-radius: var(--wp-day-radius);
+    background: transparent;
+    font-variant-numeric: tabular-nums;
+}
+
+.wp-cell:hover:not(:disabled):not(.wp-selected) {
+    background: var(--wp-hover);
+}
+
+.wp-cell.wp-selected {
+    background: var(--wp-accent);
+    color: var(--wp-accent-text) !important;
+    font-weight: 600;
+}
+
+.wp-cell:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
 .wp-nav {
     display: flex;
     align-items: center;
@@ -316,6 +364,23 @@
     font-weight: 600;
 }
 
+/* A day that already holds something: a dot under its number. */
+.wp-day.wp-marked::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--wp-accent);
+    transform: translateX(-50%);
+}
+
+.wp-day.wp-selected.wp-marked::after {
+    background: var(--wp-accent-text);
+}
+
 .wp-day:disabled {
     opacity: 0.3;
     cursor: not-allowed;
@@ -325,6 +390,61 @@
 .wp-day.wp-focus:focus {
     outline: 2px solid var(--wp-accent);
     outline-offset: -2px;
+}
+
+.wp-times {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--wp-border);
+}
+
+.wp-time {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+    color: var(--wp-text-muted);
+    font-size: 12px;
+}
+
+.wp-time select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 0;
+    border-radius: var(--wp-day-radius);
+    background: var(--wp-hover);
+    box-shadow: inset 0 0 0 1px var(--wp-border);
+    color: var(--wp-text);
+    font: inherit;
+    font-size: var(--wp-font-size);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+}
+
+.wp-time select:focus-visible {
+    outline: 2px solid var(--wp-accent);
+    outline-offset: -2px;
+}
+
+.wp-footer-end {
+    display: flex;
+    gap: 4px;
+}
+
+.wp-done {
+    padding: 4px 10px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--wp-accent);
+    color: var(--wp-accent-text) !important;
+    font-weight: 600;
+}
+
+.wp-done:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
 
 .wp-footer {
