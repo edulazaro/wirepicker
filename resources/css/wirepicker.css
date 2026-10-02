@@ -16,16 +16,31 @@
     --wire-shadow: 0 20px 50px rgba(15, 23, 42, 0.18), 0 4px 12px rgba(15, 23, 42, 0.08);
     --wire-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
+    /* Shape: plain values, set once. */
+    --wp-trigger-radius: 8px;
+    --wp-trigger-padding: 8px 12px;
+    --wp-trigger-padding-sm: 6px 10px;
+    --wp-trigger-font-size: 14px;
+    --wp-font-size: 14px;
+    --wp-day-size: 36px;
+    --wp-day-radius: 8px;
+    /* Above wiremodal (2147483600): a picker inside a modal opens over it. */
+    --wp-z-index: 2147483647;
+}
+
+/* Tokens built from the --wire-* ones. A custom property resolves where it is declared,
+   so declared on :root alone they would keep :root's colours under a theme or a dark
+   mode set lower down (on <body>, on a card): they are declared again wherever one is. */
+:root,
+[data-wire-theme],
+[data-wire-theme-mode],
+.dark {
     /* The field */
     --wp-trigger-bg: var(--wire-bg);
     --wp-trigger-text: var(--wire-text);
     --wp-trigger-placeholder: var(--wire-text-muted);
     --wp-trigger-border: var(--wire-border-strong);
     --wp-trigger-focus: var(--wire-text);
-    --wp-trigger-radius: 8px;
-    --wp-trigger-padding: 8px 12px;
-    --wp-trigger-padding-sm: 6px 10px;
-    --wp-trigger-font-size: 14px;
     --wp-trigger-icon: var(--wire-text-muted);
 
     /* The calendar */
@@ -36,15 +51,10 @@
     --wp-radius: var(--wire-radius);
     --wp-shadow: var(--wire-shadow);
     --wp-font: var(--wire-font);
-    --wp-font-size: 14px;
     --wp-accent: var(--wire-accent);
     --wp-accent-text: #ffffff;
     --wp-range: color-mix(in srgb, var(--wp-accent) 12%, transparent);
     --wp-hover: color-mix(in srgb, var(--wp-text) 6%, transparent);
-    --wp-day-size: 36px;
-    --wp-day-radius: 8px;
-    /* Above wiremodal (2147483600): a picker inside a modal opens over it. */
-    --wp-z-index: 2147483647;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -357,4 +367,300 @@
         border-right: 0;
         border-bottom: 1px solid var(--wp-border);
     }
+}
+
+/* =========================================================
+   THEMES
+   The family's themes, by the same [data-wire-theme] as wiremodal: one
+   attribute on <html> or on any container themes modals and pickers alike.
+   The --wire-* values are 1:1 with wiremodal. The popover copies the
+   picker's theme and mode when it opens (it lives on <body>), so rules
+   for the calendar are written on .wp-popover[data-wire-theme].
+   ========================================================= */
+
+/* soft: tinted with the accent */
+[data-wire-theme="soft"] {
+    --wire-radius: 12px;
+}
+.wp-popover[data-wire-theme="soft"] {
+    --wp-bg: color-mix(in srgb, var(--wire-accent) 10%, var(--wire-bg));
+    --wp-border: color-mix(in srgb, var(--wire-accent) 25%, transparent);
+    --wp-shadow: 0 4px 12px color-mix(in srgb, var(--wire-accent) 12%, transparent);
+}
+
+/* glass: frosted */
+[data-wire-theme="glass"] {
+    --wire-bg: rgba(255, 255, 255, 0.55);
+    --wire-bg-elevated: rgba(255, 255, 255, 0.55);
+    --wire-text: #0f172a;
+    --wire-text-muted: rgba(15, 23, 42, 0.7);
+    --wire-border: rgba(255, 255, 255, 0.4);
+    --wire-radius: 14px;
+    --wire-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+}
+.wp-popover[data-wire-theme="glass"] {
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+[data-wire-theme="glass"][data-wire-theme-mode="dark"],
+.dark[data-wire-theme="glass"] {
+    --wire-bg: rgba(30, 30, 35, 0.55);
+    --wire-bg-elevated: rgba(30, 30, 35, 0.55);
+    --wire-text: #f1f5f9;
+    --wire-text-muted: rgba(241, 245, 249, 0.7);
+    --wire-border: rgba(255, 255, 255, 0.1);
+}
+
+/* gradient: the calendar on the accent's gradient, white text. The field stays a plain
+   light input: white text on a page's white would vanish. */
+[data-wire-theme="gradient"] {
+    --wire-accent: #8b5cf6;
+    --wire-radius: 12px;
+
+    --wp-trigger-bg: #ffffff;
+    --wp-trigger-text: #0f172a;
+    --wp-trigger-placeholder: #64748b;
+    --wp-trigger-icon: #64748b;
+    --wp-trigger-border: rgba(15, 23, 42, 0.16);
+    --wp-trigger-focus: var(--wire-accent);
+}
+.wp-popover[data-wire-theme="gradient"] {
+    --wp-text: #ffffff;
+    --wp-text-muted: rgba(255, 255, 255, 0.78);
+    --wp-border: rgba(255, 255, 255, 0.18);
+    --wp-accent: #ffffff;
+    --wp-accent-text: var(--wire-accent);
+    --wp-range: rgba(255, 255, 255, 0.18);
+    --wp-hover: rgba(255, 255, 255, 0.12);
+    --wp-shadow: 0 10px 30px color-mix(in srgb, var(--wire-accent) 35%, transparent);
+    border-color: transparent;
+    background: linear-gradient(135deg,
+        var(--wire-accent),
+        color-mix(in srgb, var(--wire-accent) 65%, #000000));
+}
+
+/* neon: dark, glowing accent, monospace */
+[data-wire-theme="neon"] {
+    --wire-bg: #0a0a12;
+    --wire-bg-elevated: #0a0a12;
+    --wire-accent: #22d3ee;
+    --wire-text: var(--wire-accent);
+    --wire-text-muted: color-mix(in srgb, var(--wire-accent) 55%, #ffffff);
+    --wire-border: var(--wire-accent);
+    --wire-border-strong: var(--wire-accent);
+    --wire-radius: 4px;
+    --wire-shadow:
+        0 0 20px color-mix(in srgb, var(--wire-accent) 50%, transparent),
+        inset 0 0 20px color-mix(in srgb, var(--wire-accent) 8%, transparent);
+
+    --wp-font: ui-monospace, "JetBrains Mono", "Fira Code", "Courier New", monospace;
+    --wp-accent-text: #0a0a12;
+    --wp-range: color-mix(in srgb, var(--wire-accent) 18%, transparent);
+    --wp-hover: color-mix(in srgb, var(--wire-accent) 12%, transparent);
+    --wp-trigger-radius: 4px;
+    --wp-day-radius: 2px;
+}
+.wp-popover[data-wire-theme="neon"] {
+    letter-spacing: 0.3px;
+    text-shadow: 0 0 6px color-mix(in srgb, var(--wire-accent) 50%, transparent);
+}
+.wp-popover[data-wire-theme="neon"] .wp-selected {
+    text-shadow: none;
+}
+
+/* minimal: no border, a stripe of accent on the left */
+[data-wire-theme="minimal"] {
+    --wire-border: transparent;
+    --wire-accent: #0ea5e9;
+    --wire-radius: 0;
+    --wire-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+    --wp-trigger-radius: 0;
+    --wp-day-radius: 0;
+}
+.wp-popover[data-wire-theme="minimal"] {
+    /* A modal has its overlay to stand apart; a dropdown needs a little shadow. */
+    --wp-shadow: 0 6px 20px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+    border-left: 3px solid var(--wire-accent);
+}
+
+/* claude: warm minimal */
+[data-wire-theme="claude"] {
+    --wire-bg: #FAF9F5;
+    --wire-bg-elevated: #FAF9F5;
+    --wire-text: #1A1A1A;
+    --wire-text-muted: #6B6560;
+    --wire-border: rgba(26, 26, 26, 0.08);
+    --wire-accent: #C96442;
+    --wire-radius: 10px;
+    --wire-shadow:
+        0 8px 24px rgba(26, 26, 26, 0.06),
+        0 2px 6px rgba(26, 26, 26, 0.04);
+}
+.wp-popover[data-wire-theme="claude"] {
+    border-top: 2px solid var(--wire-accent);
+    letter-spacing: -0.005em;
+}
+[data-wire-theme="claude"][data-wire-theme-mode="dark"],
+.dark[data-wire-theme="claude"] {
+    --wire-bg: #262321;
+    --wire-bg-elevated: #262321;
+    --wire-text: #F5F4EE;
+    --wire-text-muted: #B8B3AC;
+    --wire-border: rgba(255, 255, 255, 0.08);
+}
+
+/* chatgpt: clean neutral, round days */
+[data-wire-theme="chatgpt"] {
+    --wire-bg: #FFFFFF;
+    --wire-bg-elevated: #FFFFFF;
+    --wire-text: #0D0D0D;
+    --wire-text-muted: #5D5D5D;
+    --wire-border: #E5E5E5;
+    --wire-accent: #10a37f;
+    --wire-radius: 12px;
+    --wire-shadow:
+        0 6px 24px rgba(0, 0, 0, 0.05),
+        0 1px 2px rgba(0, 0, 0, 0.04);
+    --wire-font: "Söhne", ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Inter", sans-serif;
+
+    --wp-trigger-radius: 12px;
+    --wp-day-radius: 999px;
+}
+[data-wire-theme="chatgpt"][data-wire-theme-mode="dark"],
+.dark[data-wire-theme="chatgpt"] {
+    --wire-bg: #2F2F2F;
+    --wire-bg-elevated: #2F2F2F;
+    --wire-text: #ECECEC;
+    --wire-text-muted: #B4B4B4;
+    --wire-border: #4D4D4F;
+}
+
+/* studio: gray-900, sharp corners, deep shadow */
+[data-wire-theme="studio"] {
+    --wire-bg: #ffffff;
+    --wire-bg-elevated: #ffffff;
+    --wire-text: #111827;
+    --wire-text-muted: #6b7280;
+    --wire-border: #e5e7eb;
+    --wire-accent: #111827;
+    --wire-radius: 2px;
+    --wire-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(17, 24, 39, 0.1);
+    --wire-font: "Sora", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --wp-trigger-radius: 2px;
+    --wp-day-radius: 2px;
+}
+[data-wire-theme="studio"][data-wire-theme-mode="dark"],
+.dark[data-wire-theme="studio"] {
+    --wire-bg: #111827;
+    --wire-bg-elevated: #111827;
+    --wire-text: #f3f4f6;
+    --wire-text-muted: #9ca3af;
+    --wire-border: #1f2937;
+
+    /* The accent is gray-900: a selected day would be dark on dark. */
+    --wp-accent: #f3f4f6;
+    --wp-accent-text: #111827;
+}
+
+/* synthwave: retro purple and magenta. The field is dark as well: the theme's white
+   text needs a ground of its own. */
+[data-wire-theme="synthwave"] {
+    --wire-accent: #ff00ff;
+    --wire-radius: 0;
+    --wire-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+        0 0 14px color-mix(in srgb, var(--wire-accent) 40%, transparent),
+        0 4px 20px color-mix(in srgb, var(--wire-accent) 25%, transparent);
+
+    --wp-font: ui-monospace, "JetBrains Mono", "Courier New", monospace;
+    --wp-trigger-bg: #1a0033;
+    --wp-trigger-text: #ffffff;
+    --wp-trigger-placeholder: rgba(255, 255, 255, 0.6);
+    --wp-trigger-icon: var(--wire-accent);
+    --wp-trigger-border: var(--wire-accent);
+    --wp-trigger-focus: var(--wire-accent);
+    --wp-trigger-radius: 0;
+    --wp-day-radius: 0;
+}
+.wp-popover[data-wire-theme="synthwave"] {
+    --wp-text: #ffffff;
+    --wp-text-muted: rgba(255, 255, 255, 0.7);
+    --wp-border: var(--wire-accent);
+    --wp-range: color-mix(in srgb, var(--wire-accent) 25%, transparent);
+    --wp-hover: rgba(255, 255, 255, 0.08);
+    background: linear-gradient(135deg, #1a0033 0%, #2d0066 100%);
+    letter-spacing: 0.04em;
+}
+.wp-popover[data-wire-theme="synthwave"] .wp-title {
+    color: var(--wire-accent);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-shadow: 0 0 8px var(--wire-accent);
+}
+
+/* megaflow: Flowbite-style clean white card */
+[data-wire-theme="megaflow"] {
+    --wire-bg: #ffffff;
+    --wire-bg-elevated: #ffffff;
+    --wire-text: #111827;
+    --wire-text-muted: #6b7280;
+    --wire-border: rgba(0, 0, 0, 0.05);
+    --wire-accent: #3b82f6;
+    --wire-radius: 8px;
+    --wire-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.1),
+        0 1px 2px rgba(0, 0, 0, 0.06);
+    --wire-font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Inter", sans-serif;
+}
+[data-wire-theme="megaflow"][data-wire-theme-mode="dark"],
+.dark[data-wire-theme="megaflow"] {
+    --wire-bg: #1f2937;
+    --wire-bg-elevated: #1f2937;
+    --wire-text: #f9fafb;
+    --wire-text-muted: #9ca3af;
+    --wire-border: rgba(255, 255, 255, 0.06);
+}
+
+/* brutalist: black border, hard offset shadow */
+[data-wire-theme="brutalist"] {
+    --wire-bg: #ffffff;
+    --wire-bg-elevated: #ffffff;
+    --wire-text: #0a0a0a;
+    --wire-text-muted: #525252;
+    --wire-border: #0a0a0a;
+    --wire-border-strong: #0a0a0a;
+    --wire-accent: #fef08a;
+    --wire-radius: 4px;
+    --wire-shadow: 4px 4px 0 0 #0a0a0a;
+
+    /* The accent is yellow: white on it does not read. */
+    --wp-accent-text: #0a0a0a;
+    --wp-range: color-mix(in srgb, #fef08a 55%, transparent);
+    --wp-trigger-radius: 4px;
+    --wp-day-radius: 3px;
+}
+[data-wire-theme="brutalist"] .wp-trigger {
+    box-shadow: inset 0 0 0 1px var(--wp-trigger-border), 2px 2px 0 0 var(--wp-trigger-border);
+}
+[data-wire-theme="brutalist"] .wp-trigger:focus-visible,
+[data-wire-theme="brutalist"] .wp-trigger[aria-expanded="true"] {
+    box-shadow: inset 0 0 0 2px var(--wp-trigger-border), 2px 2px 0 0 var(--wp-trigger-border);
+}
+.wp-popover[data-wire-theme="brutalist"] .wp-selected {
+    box-shadow: inset 0 0 0 1px #0a0a0a;
+}
+[data-wire-theme="brutalist"][data-wire-theme-mode="dark"],
+.dark[data-wire-theme="brutalist"] {
+    --wire-bg: #0a0a0a;
+    --wire-bg-elevated: #0a0a0a;
+    --wire-text: #f5f5f5;
+    --wire-text-muted: #a3a3a3;
+    --wire-border: #f5f5f5;
+    --wire-border-strong: #f5f5f5;
+    --wire-shadow: 4px 4px 0 0 #f5f5f5;
 }

@@ -2,7 +2,7 @@
 
 # wirepicker
 
-Framework-agnostic date and date-range picker for Laravel, Livewire and Alpine. Pure CSS, themed through CSS variables, localized through `Intl`. Sibling of [wiremodal](https://github.com/edulazaro/wiremodal) and [wiretoast](https://github.com/edulazaro/wiretoast).
+Framework-agnostic date and date-range picker for Laravel, Livewire and Alpine. Pure CSS, localized through `Intl`. Part of the `wire*` family: themeable through the shared `data-wire-theme` attribute, visually coherent with [wiremodal](https://github.com/edulazaro/wiremodal), [wiretoast](https://github.com/edulazaro/wiretoast), [wirecookies](https://github.com/edulazaro/wirecookies) and [wirebug](https://github.com/edulazaro/wirebug).
 
 One date or a range · shortcuts · keyboard · 0 runtime deps · works with or without Livewire/Alpine.
 
@@ -109,6 +109,33 @@ The few words of its own (placeholder, Today, Clear, the shortcuts) ship in Engl
 ```bash
 php artisan vendor:publish --tag=wirepicker-lang
 ```
+
+## Themes
+
+Pick the theme once on `<html>` (shared with the rest of the family):
+
+```html
+<html data-wire-theme="studio">
+```
+
+The family's themes:
+
+| Theme | Vibe |
+|---|---|
+| default | Neutral light/dark, follows system |
+| `soft` | Tinted with the accent |
+| `glass` | Frosted backdrop blur |
+| `gradient` | The calendar on a vivid gradient, white text |
+| `neon` | Dark, glowing accent, mono font |
+| `minimal` | No border, left accent stripe |
+| `claude` | Warm minimal, Anthropic-inspired |
+| `chatgpt` | Clean neutral, round days |
+| `studio` | Gray-900, sharp corners, deep shadow |
+| `synthwave` | Retro 80s purple/magenta neon |
+| `megaflow` | Flowbite-style: clean white card |
+| `brutalist` | Black border, hard offset shadow |
+
+Dark mode: set `data-wire-theme-mode="dark"` or add the `.dark` class to an ancestor. A theme set on a container instead of `<html>` works too: the calendar opens on `<body>` and takes the picker's theme and mode with it.
 
 ## Custom theme
 

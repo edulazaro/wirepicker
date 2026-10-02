@@ -295,11 +295,34 @@
         popover.style.left = `${Math.round(left)}px`;
     }
 
+    /**
+     * The popover lives on <body>, so a theme set on a container around the picker would
+     * not reach it: it takes the picker's theme and mode with it each time it opens.
+     */
+    function theme(root) {
+        const el = element();
+        const themed = root.closest('[data-wire-theme]');
+        const mode = root.closest('[data-wire-theme-mode], .dark');
+
+        if (themed) {
+            el.dataset.wireTheme = themed.dataset.wireTheme;
+        } else {
+            delete el.dataset.wireTheme;
+        }
+
+        if (mode) {
+            el.dataset.wireThemeMode = mode.dataset.wireThemeMode || 'dark';
+        } else {
+            delete el.dataset.wireThemeMode;
+        }
+    }
+
     function show(root) {
         const { start } = read(root);
         const focus = start || today();
 
         open = { root, view: new Date(focus.getFullYear(), focus.getMonth(), 1), focus, anchor: null, hover: null };
+        theme(root);
         element().hidden = false;
         root.querySelector('[data-wp-trigger]')?.setAttribute('aria-expanded', 'true');
         render();
