@@ -1,0 +1,52 @@
+{
+    "name": "edulazaro/wirepicker",
+    "description": "Framework-agnostic date and date-range picker for Laravel, Livewire and Alpine. Pure CSS, themed through CSS variables, localized through Intl. Sibling of wiremodal and wiretoast.",
+    "keywords": [
+        "laravel",
+        "livewire",
+        "alpine",
+        "datepicker",
+        "date-range",
+        "calendar",
+        "ui"
+    ],
+    "license": "MIT",
+    "type": "library",
+    "require": {
+        "php": ">=8.2",
+        "illuminate/support": ">=11.0",
+        "illuminate/view": ">=11.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0|^11.0|^12.0",
+        "orchestra/testbench": "^9.0|^10.0|^11.0"
+    },
+    "suggest": {
+        "livewire/livewire": "Bind it with wire:model like any input."
+    },
+    "autoload": {
+        "psr-4": {
+            "EduLazaro\\Wirepicker\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "EduLazaro\\Wirepicker\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Edu Lazaro",
+            "email": "edu@edulazaro.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "EduLazaro\\Wirepicker\\WirepickerServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

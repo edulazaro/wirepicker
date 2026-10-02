@@ -1,0 +1,360 @@
+/* =========================================================
+   wirepicker - design tokens
+   Meta-tokens (--wire-*) are shared with the wire* family
+   (wiremodal, wiretoast). Component tokens live under --wp-*.
+   Override either layer to customise.
+   ========================================================= */
+:root {
+    --wire-bg: #ffffff;
+    --wire-bg-elevated: #ffffff;
+    --wire-text: #0f172a;
+    --wire-text-muted: #64748b;
+    --wire-border: rgba(15, 23, 42, 0.08);
+    --wire-border-strong: rgba(15, 23, 42, 0.16);
+    --wire-accent: #2563eb;
+    --wire-radius: 10px;
+    --wire-shadow: 0 20px 50px rgba(15, 23, 42, 0.18), 0 4px 12px rgba(15, 23, 42, 0.08);
+    --wire-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+    /* The field */
+    --wp-trigger-bg: var(--wire-bg);
+    --wp-trigger-text: var(--wire-text);
+    --wp-trigger-placeholder: var(--wire-text-muted);
+    --wp-trigger-border: var(--wire-border-strong);
+    --wp-trigger-focus: var(--wire-text);
+    --wp-trigger-radius: 8px;
+    --wp-trigger-padding: 8px 12px;
+    --wp-trigger-padding-sm: 6px 10px;
+    --wp-trigger-font-size: 14px;
+    --wp-trigger-icon: var(--wire-text-muted);
+
+    /* The calendar */
+    --wp-bg: var(--wire-bg-elevated);
+    --wp-text: var(--wire-text);
+    --wp-text-muted: var(--wire-text-muted);
+    --wp-border: var(--wire-border);
+    --wp-radius: var(--wire-radius);
+    --wp-shadow: var(--wire-shadow);
+    --wp-font: var(--wire-font);
+    --wp-font-size: 14px;
+    --wp-accent: var(--wire-accent);
+    --wp-accent-text: #ffffff;
+    --wp-range: color-mix(in srgb, var(--wp-accent) 12%, transparent);
+    --wp-hover: color-mix(in srgb, var(--wp-text) 6%, transparent);
+    --wp-day-size: 36px;
+    --wp-day-radius: 8px;
+    /* Above wiremodal (2147483600): a picker inside a modal opens over it. */
+    --wp-z-index: 2147483647;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --wire-bg: #0f1115;
+        --wire-bg-elevated: #16181d;
+        --wire-text: #f1f5f9;
+        --wire-text-muted: #94a3b8;
+        --wire-border: rgba(255, 255, 255, 0.1);
+        --wire-border-strong: rgba(255, 255, 255, 0.18);
+        --wire-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+}
+
+[data-wire-theme-mode="dark"], .dark {
+    --wire-bg: #0f1115;
+    --wire-bg-elevated: #16181d;
+    --wire-text: #f1f5f9;
+    --wire-text-muted: #94a3b8;
+    --wire-border: rgba(255, 255, 255, 0.1);
+    --wire-border-strong: rgba(255, 255, 255, 0.18);
+    --wire-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+/* =========================================================
+   The field: looks like an input, opens the calendar
+   ========================================================= */
+.wp-picker {
+    position: relative;
+    display: inline-flex;
+    min-width: 0;
+    font-family: var(--wp-font);
+}
+
+.wp-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+    padding: var(--wp-trigger-padding);
+    padding-right: 32px;
+    border: 0;
+    border-radius: var(--wp-trigger-radius);
+    background: var(--wp-trigger-bg);
+    box-shadow: inset 0 0 0 1px var(--wp-trigger-border);
+    color: var(--wp-trigger-text);
+    font: inherit;
+    font-size: var(--wp-trigger-font-size);
+    line-height: 1.43;
+    text-align: left;
+    cursor: pointer;
+}
+
+.wp-picker[data-wp-size="sm"] .wp-trigger {
+    padding: var(--wp-trigger-padding-sm);
+    padding-right: 30px;
+}
+
+.wp-trigger:focus-visible,
+.wp-trigger[aria-expanded="true"] {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--wp-trigger-focus);
+}
+
+.wp-trigger-icon {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    color: var(--wp-trigger-icon);
+}
+
+.wp-trigger-text {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-variant-numeric: tabular-nums;
+}
+
+.wp-trigger-text[data-wp-empty] {
+    color: var(--wp-trigger-placeholder);
+}
+
+.wp-clear {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--wp-trigger-icon);
+    cursor: pointer;
+    transform: translateY(-50%);
+}
+
+.wp-clear:hover {
+    background: var(--wp-hover);
+    color: var(--wp-trigger-text);
+}
+
+.wp-clear[hidden] {
+    display: none;
+}
+
+.wp-clear svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* =========================================================
+   The calendar
+   ========================================================= */
+.wp-popover {
+    position: fixed;
+    z-index: var(--wp-z-index);
+    display: flex;
+    overflow: hidden;
+    border: 1px solid var(--wp-border);
+    border-radius: var(--wp-radius);
+    background: var(--wp-bg);
+    box-shadow: var(--wp-shadow);
+    color: var(--wp-text);
+    font-family: var(--wp-font);
+    font-size: var(--wp-font-size);
+}
+
+.wp-popover[hidden] {
+    display: none;
+}
+
+.wp-popover button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+}
+
+.wp-presets {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 140px;
+    padding: 10px 8px;
+    border-right: 1px solid var(--wp-border);
+}
+
+.wp-preset {
+    padding: 7px 10px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.wp-preset:hover {
+    background: var(--wp-hover);
+}
+
+.wp-calendar {
+    padding: 12px;
+}
+
+.wp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.wp-title {
+    font-weight: 600;
+}
+
+.wp-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--wp-text-muted) !important;
+}
+
+.wp-nav:hover {
+    background: var(--wp-hover);
+    color: var(--wp-text) !important;
+}
+
+.wp-nav svg {
+    width: 16px;
+    height: 16px;
+}
+
+.wp-weekdays,
+.wp-days {
+    display: grid;
+    grid-template-columns: repeat(7, var(--wp-day-size));
+}
+
+.wp-weekdays span {
+    padding: 4px 0;
+    color: var(--wp-text-muted);
+    font-size: 12px;
+    text-align: center;
+}
+
+.wp-day {
+    position: relative;
+    width: var(--wp-day-size);
+    height: var(--wp-day-size);
+    padding: 0;
+    border: 0;
+    border-radius: var(--wp-day-radius);
+    background: transparent;
+    font-variant-numeric: tabular-nums;
+}
+
+.wp-day:hover:not(:disabled):not(.wp-selected) {
+    background: var(--wp-hover);
+}
+
+.wp-day.wp-outside {
+    color: var(--wp-text-muted) !important;
+    opacity: 0.6;
+}
+
+.wp-day.wp-today {
+    font-weight: 700;
+    box-shadow: inset 0 0 0 1px var(--wp-border);
+}
+
+.wp-day.wp-in-range {
+    border-radius: 0;
+    background: var(--wp-range);
+}
+
+.wp-day.wp-start:not(.wp-end) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.wp-day.wp-end:not(.wp-start) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.wp-day.wp-selected {
+    background: var(--wp-accent);
+    color: var(--wp-accent-text) !important;
+    font-weight: 600;
+}
+
+.wp-day:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.wp-day:focus-visible,
+.wp-day.wp-focus:focus {
+    outline: 2px solid var(--wp-accent);
+    outline-offset: -2px;
+}
+
+.wp-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--wp-border);
+}
+
+.wp-link {
+    padding: 4px 6px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--wp-text-muted) !important;
+}
+
+.wp-link:hover {
+    background: var(--wp-hover);
+    color: var(--wp-text) !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .wp-day,
+    .wp-preset,
+    .wp-nav {
+        transition: background-color 80ms ease;
+    }
+}
+
+@media (max-width: 480px) {
+    .wp-popover {
+        flex-direction: column;
+    }
+
+    .wp-presets {
+        flex-direction: row;
+        flex-wrap: wrap;
+        border-right: 0;
+        border-bottom: 1px solid var(--wp-border);
+    }
+}

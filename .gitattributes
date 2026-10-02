@@ -1,0 +1,4 @@
+art/ export-ignore
+tests/ export-ignore
+CLAUDE.md export-ignore
+package.json export-ignore
