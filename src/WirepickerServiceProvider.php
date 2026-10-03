@@ -3,6 +3,7 @@
 namespace EduLazaro\Wirepicker;
 
 use EduLazaro\Wirepicker\Components\Picker;
+use EduLazaro\Wirepicker\Components\TimePicker;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 
@@ -31,6 +32,7 @@ class WirepickerServiceProvider extends ServiceProvider
 
         $this->callAfterResolving(BladeCompiler::class, function (BladeCompiler $blade) {
             $blade->component(Picker::class, 'wirepicker');
+            $blade->component(TimePicker::class, 'wiretimepicker');
         });
     }
 }

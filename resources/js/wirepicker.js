@@ -14,6 +14,9 @@
  * Values written from outside (a Livewire property reset, a form reset) are picked up after
  * every Livewire request, or by calling Wirepicker.refresh().
  *
+ * `<x-wiretimepicker>` uses the same root with data-wp-mode="time": one input holding "H:i",
+ * and a list of times in the popover instead of a calendar.
+ *
  * Languages come from Intl: months, weekdays, the date format and the first day of the week
  * all follow data-wp-locale, with no locale files.
  */
@@ -63,6 +66,14 @@
         const every = step > 0 && step <= 720 ? step : 15;
 
         return Array.from({ length: Math.ceil(1440 / every) }, (_, i) => `${pad(Math.floor((i * every) / 60))}:${pad((i * every) % 60)}`);
+    }
+
+    /** "H:i" when it is a real time of day, else null. */
+    const parseTime = (value) => (/^([01]\d|2[0-3]):[0-5]\d$/.test(value || '') ? value : null);
+
+    /** The times offered between `min` and `max` ("H:i" or null), every `step` minutes. */
+    function timesBetween(step, min = null, max = null) {
+        return times(step).filter((t) => (!min || t >= min) && (!max || t <= max));
     }
 
     const addDays = (date, days) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
@@ -196,6 +207,9 @@
         return {
             locale,
             range: root.dataset.wpMode === 'range',
+            timeOnly: root.dataset.wpMode === 'time',
+            minTime: parseTime(root.dataset.wpMinTime),
+            maxTime: parseTime(root.dataset.wpMaxTime),
             weekStart: root.dataset.wpWeekStart !== undefined ? +root.dataset.wpWeekStart : weekStartFor(locale),
             min: parse(root.dataset.wpMin),
             max: parse(root.dataset.wpMax),
@@ -232,6 +246,13 @@
         return { start: start.date, end: end.date, startTime: start.time, endTime: end.time };
     }
 
+    /** A time of day the locale's way: "09:00" in Spanish, "9:00 AM" in American English. */
+    function formatTime(time, locale) {
+        const [hours, minutes] = time.split(':');
+
+        return new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(new Date(2024, 0, 1, +hours, +minutes));
+    }
+
     /** The day in the locale's own format, and its time too when there is one. */
     function format(date, locale, time = null) {
         if (!time) {
@@ -248,10 +269,25 @@
 
     /** Puts the current value on the trigger, and shows the clear button when there is one. */
     function paint(root) {
-        const { locale, range, labels, time } = config(root);
+        const { locale, range, labels, time, timeOnly } = config(root);
         const { start, end, startTime, endTime } = read(root);
         const display = root.querySelector('[data-wp-display]');
         const clear = root.querySelector('[data-wp-clear]');
+
+        if (timeOnly) {
+            const chosen = parseTime(input(root, 'start')?.value);
+
+            if (display) {
+                display.textContent = chosen ? formatTime(chosen, locale) : labels.placeholder || '';
+                display.toggleAttribute('data-wp-empty', !chosen);
+            }
+
+            if (clear) {
+                clear.hidden = !chosen;
+            }
+
+            return;
+        }
 
         let text = labels.placeholder || '';
 
@@ -269,6 +305,24 @@
         if (clear) {
             clear.hidden = !start;
         }
+    }
+
+    /** A time picker's value: "H:i", or empty. */
+    function writeTime(root, time) {
+        const field = input(root, 'start');
+
+        if (field) {
+            field.value = time || '';
+            field.dispatchEvent(new Event('input', { bubbles: true }));
+            field.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        paint(root);
+
+        root.dispatchEvent(new CustomEvent('wirepicker:change', {
+            bubbles: true,
+            detail: { value: time || null, start: time || null, end: null },
+        }));
     }
 
     /**
@@ -342,6 +396,12 @@
         }
 
         const cfg = config(open.root);
+
+        if (cfg.timeOnly) {
+            renderTimes(cfg);
+            return;
+        }
+
         const { start, end } = read(open.root);
         const escape = (text) => String(text).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
         const selStart = open.anchor || start;
@@ -445,6 +505,34 @@
 
         element().dataset.wpSize = open.root.dataset.wpSize || 'md';
         position();
+    }
+
+    /** A time picker's popover: the times of the day in rows of four, the chosen one marked. */
+    function renderTimes(cfg) {
+        const chosen = parseTime(input(open.root, 'start')?.value);
+        const offered = timesBetween(cfg.step, cfg.minTime, cfg.maxTime);
+        const list = chosen && !offered.includes(chosen) ? [...offered, chosen].sort() : offered;
+        const label = (text) => String(text).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+        element().innerHTML = `
+            <div class="wp-calendar">
+                <div class="wp-time-list" role="listbox">${list.map((t) => `<button type="button" class="wp-cell${t === chosen ? ' wp-selected' : ''}" data-wp-pick-time="${t}" role="option" aria-selected="${t === chosen}" tabindex="-1">${label(formatTime(t, cfg.locale))}</button>`).join('')}</div>
+                ${cfg.clearable ? `<div class="wp-footer"><span></span><span class="wp-footer-end"><button type="button" class="wp-link" data-wp-clear-all>${label(cfg.labels.clear || '')}</button></span></div>` : ''}
+            </div>`;
+
+        element().dataset.wpSize = open.root.dataset.wpSize || 'md';
+        position();
+
+        // The chosen time in view and focused; with none, the one closest to now: a list of 96
+        // would otherwise open at midnight.
+        const now = new Date();
+        const nowTime = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        const buttons = [...popover.querySelectorAll('[data-wp-pick-time]')];
+        const current = popover.querySelector('.wp-selected')
+            || buttons.find((button) => button.dataset.wpPickTime >= nowTime)
+            || buttons[buttons.length - 1];
+        current?.scrollIntoView({ block: 'center' });
+        current?.focus({ preventScroll: true });
     }
 
     function position() {
@@ -584,8 +672,12 @@
         const day = event.target.closest('[data-wp-day]');
         const nav = event.target.closest('[data-wp-nav]');
         const preset = event.target.closest('[data-wp-preset]');
+        const time = event.target.closest('[data-wp-pick-time]');
 
-        if (day && !day.disabled) {
+        if (time) {
+            writeTime(open.root, time.dataset.wpPickTime);
+            hide(true);
+        } else if (day && !day.disabled) {
             choose(parse(day.dataset.wpDay));
         } else if (nav) {
             // A month at a time among the days, a year among the months, twelve among the years.
@@ -644,7 +736,7 @@
                 choose(today());
             }
         } else if (event.target.closest('[data-wp-clear-all]')) {
-            write(open.root, null, null);
+            config(open.root).timeOnly ? writeTime(open.root, null) : write(open.root, null, null);
             hide(true);
         }
     }
@@ -692,6 +784,18 @@
         if (event.key === 'Escape') {
             event.preventDefault();
             hide(true);
+        } else if (config(open.root).timeOnly) {
+            // Among times: left and right one by one, up and down a row of four.
+            const buttons = [...popover.querySelectorAll('[data-wp-pick-time]')];
+            const at = buttons.indexOf(document.activeElement);
+            const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -4, ArrowDown: 4 }[event.key];
+
+            if (step && at !== -1) {
+                event.preventDefault();
+                const next = buttons[Math.min(Math.max(at + step, 0), buttons.length - 1)];
+                next.scrollIntoView({ block: 'nearest' });
+                next.focus({ preventScroll: true });
+            }
         } else if (event.key in moves && open.zoom === 'days' && popover.contains(document.activeElement) && !document.activeElement.matches('select')) {
             event.preventDefault();
             open.focus = addDays(open.focus, moves[event.key]);
@@ -721,8 +825,9 @@
             const root = trigger.closest('[data-wirepicker]');
             open && open.root === root ? hide() : (hide(), show(root));
         } else if (clear) {
+            const root = clear.closest('[data-wirepicker]');
             hide();
-            write(clear.closest('[data-wirepicker]'), null, null);
+            config(root).timeOnly ? writeTime(root, null) : write(root, null, null);
         } else if (open && !event.composedPath().includes(popover)) {
             // composedPath, not contains(): a click that redraws the calendar has already
             // detached its own button by the time it reaches the document.
@@ -760,6 +865,6 @@
         refresh,
         close: hide,
         // The date arithmetic, exposed for tests and for anyone building on it.
-        utils: { parse, parseValue, times, toIso, grid, presetRange, presetDate, addMonthsClamped, unavailable, firstAvailable, weekStartFor },
+        utils: { parse, parseValue, parseTime, times, timesBetween, toIso, grid, presetRange, presetDate, addMonthsClamped, unavailable, firstAvailable, weekStartFor },
     };
 })();

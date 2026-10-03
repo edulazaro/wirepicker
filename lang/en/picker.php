@@ -2,6 +2,7 @@
 
 return [
     'placeholder' => 'Pick a date',
+    'placeholder-time' => 'Pick a time',
     'placeholder-range' => 'Any date',
     'today' => 'Today',
     'clear' => 'Clear',

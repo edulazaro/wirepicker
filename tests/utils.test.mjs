@@ -100,3 +100,13 @@ test('the first available day skips weekends and disabled dates', () => {
     assert.equal(toIso(firstAvailable(new Date(2026, 11, 5), rules)), '2026-12-09');
     assert.equal(toIso(firstAvailable(new Date(2026, 11, 9), rules)), '2026-12-09');
 });
+
+test('a time picker offers the times between its min and max, and reads only real times', () => {
+    const { timesBetween, parseTime } = window.Wirepicker.utils;
+
+    assert.deepEqual([...timesBetween(60, '06:00', '09:00')], ['06:00', '07:00', '08:00', '09:00']);
+    assert.equal(timesBetween(15).length, 96);
+    assert.equal(parseTime('09:30'), '09:30');
+    assert.equal(parseTime('24:00'), null);
+    assert.equal(parseTime('9:30'), null);
+});

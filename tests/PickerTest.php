@@ -181,4 +181,27 @@ class PickerTest extends TestCase
         $this->assertStringContainsString('data-wp-disabled="{&quot;2026-12-08&quot;:&quot;Inmaculada&quot;,&quot;2026-12-25&quot;:&quot;&quot;}"', $html);
         $this->assertStringContainsString('data-wp-allow-unavailable', $html);
     }
+
+    public function test_a_time_picker_binds_one_hh_mm_field_and_its_limits(): void
+    {
+        $html = $this->render('<x-wiretimepicker wire:model="sendAt" min="06:00" max="22:00" :step="30" id="send-at" />');
+
+        $this->assertStringContainsString('data-wp-mode="time"', $html);
+        $this->assertSame(1, substr_count($html, 'data-wp-input='));
+        $this->assertStringContainsString('wire:model="sendAt"', $html);
+        $this->assertStringContainsString('data-wp-min-time="06:00"', $html);
+        $this->assertStringContainsString('data-wp-max-time="22:00"', $html);
+        $this->assertStringContainsString('data-wp-step="30"', $html);
+        $this->assertStringContainsString('id="send-at"', $html);
+    }
+
+    public function test_a_time_picker_drops_a_limit_that_is_not_a_time_and_keeps_a_plain_form_value(): void
+    {
+        $html = $this->render('<x-wiretimepicker name="opens" value="09:30" min="25:00" locale="es" />');
+
+        $this->assertStringNotContainsString('data-wp-min-time', $html);
+        $this->assertStringContainsString('name="opens"', $html);
+        $this->assertStringContainsString('value="09:30"', $html);
+        $this->assertStringContainsString('Elegir hora', $html);
+    }
 }

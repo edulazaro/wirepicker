@@ -282,6 +282,26 @@
     cursor: not-allowed;
 }
 
+/* <x-wiretimepicker>: the day's times in rows of four, scrolling in a short box. */
+.wp-time-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    width: calc(var(--wp-day-size) * 7);
+    max-height: calc(var(--wp-day-size) * 7);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.wp-time-list .wp-cell {
+    height: var(--wp-day-size);
+}
+
+.wp-time-list .wp-cell:focus-visible {
+    outline: 2px solid var(--wp-accent);
+    outline-offset: -2px;
+}
+
 .wp-nav {
     display: flex;
     align-items: center;

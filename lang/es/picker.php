@@ -3,6 +3,7 @@
 return [
     'placeholder' => 'Elegir fecha',
     'placeholder-range' => 'Cualquier fecha',
+    'placeholder-time' => 'Elegir hora',
     'today' => 'Hoy',
     'clear' => 'Borrar',
     'previous' => 'Mes anterior',

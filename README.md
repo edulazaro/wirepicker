@@ -104,6 +104,25 @@ Values become `Y-m-d H:i` (`2026-10-08 10:30`), the start and the end each with 
 
 The time is optional and off by default: without `time`, nothing changes.
 
+## A time of day
+
+When there is no date at all ("send the summary at", "opens at"), use `<x-wiretimepicker>`. It is its own component, not a mode of the calendar: weekends, ranges and unavailable days mean nothing for a time.
+
+```blade
+<x-wiretimepicker wire:model="sendAt" />
+<x-wiretimepicker wire:model="opensAt" min="06:00" max="22:00" :step="30" />
+```
+
+The value is `H:i` (`09:30`), `''` when empty. The popover lists the day's times every `step` minutes, in rows of four, scrolled to the chosen one (or, while empty, to the current time); arrows move among them, Enter or a click picks one and closes. The field shows the time the locale's way: `09:30` in Spanish, `09:30 AM` in American English. It never shows the browser's own time field, which writes AM/PM on an English browser and cannot be styled.
+
+| Attribute | Default | |
+| --- | --- | --- |
+| `min` / `max` | none | First and last time offered, `H:i` |
+| `step` | `15` | Minutes between the times offered |
+| `placeholder`, `clearable`, `name`, `value`, `size`, `locale`, `id` | | As in `<x-wirepicker>` |
+
+It shares the picker's popover, themes, `wirepicker:change` event and `Wirepicker.refresh()`.
+
 ## Plain forms
 
 Without Livewire, give it a `name` and, if you like, a `value`:
