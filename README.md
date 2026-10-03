@@ -2,9 +2,9 @@
 
 # wirepicker
 
-Framework-agnostic date and date-range picker for Laravel, Livewire and Alpine. Pure CSS, localized through `Intl`. Part of the `wire*` family: themeable through the shared `data-wire-theme` attribute, visually coherent with [wiremodal](https://github.com/edulazaro/wiremodal), [wiretoast](https://github.com/edulazaro/wiretoast), [wirecookies](https://github.com/edulazaro/wirecookies) and [wirebug](https://github.com/edulazaro/wirebug).
+Framework-agnostic date, date-range and time picker for Laravel, Livewire and Alpine. Pure CSS, localized through `Intl`. Part of the `wire*` family: themeable through the shared `data-wire-theme` attribute, visually coherent with [wiremodal](https://github.com/edulazaro/wiremodal), [wiretoast](https://github.com/edulazaro/wiretoast), [wirecookies](https://github.com/edulazaro/wirecookies) and [wirebug](https://github.com/edulazaro/wirebug).
 
-One date or a range · shortcuts · keyboard · 0 runtime deps · works with or without Livewire/Alpine.
+One date, a range or a time of day · shortcuts · keyboard · 0 runtime deps · works with or without Livewire/Alpine.
 
 ## Install
 
@@ -258,7 +258,7 @@ The calendar lives on `<body>` so no table, card or modal around the picker can 
 
 ## Keyboard
 
-Arrows move a day or a week, Page Up and Page Down a month, Enter picks, Escape closes and gives the focus back to the field.
+Arrows move a day or a week, Page Up and Page Down a month, Enter picks, Escape closes and gives the focus back to the field. In `<x-wiretimepicker>` the arrows move a time or a row of four.
 
 ## Tests
 
