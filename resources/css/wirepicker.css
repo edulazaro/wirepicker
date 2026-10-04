@@ -821,3 +821,20 @@
     --wire-border-strong: #f5f5f5;
     --wire-shadow: 4px 4px 0 0 #f5f5f5;
 }
+
+/* toxic: swamp dark, lime accent, dark always (1:1 with wiretables, wiremodal and wiretoast) */
+[data-wire-theme="toxic"] {
+    --wire-bg: #0c1317;
+    --wire-bg-elevated: #111b20;
+    --wire-accent: #a3e635;
+    --wire-text: #ecfccb;
+    --wire-text-muted: rgba(217, 249, 157, 0.62);
+    --wire-border: rgba(163, 230, 53, 0.18);
+    --wire-border-strong: rgba(163, 230, 53, 0.4);
+    --wire-radius: 12px;
+    --wire-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(163, 230, 53, 0.08);
+
+    --wp-accent-text: #0c1317;
+    --wp-range: rgba(163, 230, 53, 0.16);
+    --wp-hover: rgba(163, 230, 53, 0.1);
+}

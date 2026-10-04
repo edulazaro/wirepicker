@@ -207,6 +207,7 @@ The family's themes:
 | `synthwave` | Retro 80s purple/magenta neon |
 | `megaflow` | Flowbite-style: clean white card |
 | `brutalist` | Black border, hard offset shadow |
+| `toxic` | Swamp dark, lime accent; dark only |
 
 Dark mode: set `data-wire-theme-mode="dark"` or add the `.dark` class to an ancestor. A theme set on a container instead of `<html>` works too: the calendar opens on `<body>` and takes the picker's theme and mode with it.
 
