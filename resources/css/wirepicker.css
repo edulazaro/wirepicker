@@ -152,6 +152,21 @@
 
 .wp-picker--field .wp-clear { right: 10px; }
 
+/*
+   And the field has to KEEP its row, with enough specificity to survive the host's class.
+
+   This is the seam of the whole idea: the skin is the host's and the layout is ours, and
+   `display` is layout. A host input class almost always carries `display: block` (it is how an
+   input fills its column), and a class qualified by tag, `button.my-input`, outweighs a plain
+   `.wp-trigger`. So the row collapsed and the icon landed on one line and the text on the next.
+   Two classes outweigh it back.
+*/
+.wp-picker--field .wp-trigger--bare {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 /* And its focus ring: the host's `:focus` lands on the BUTTON, so leaving the package's inset
    ring on would paint two. */
 .wp-trigger--bare:focus-visible,
