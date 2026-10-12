@@ -367,7 +367,10 @@
     let open = null; // { root, view: Date (1st of month), focus: Date, anchor: Date|null, hover: Date|null }
 
     function element() {
-        if (!popover) {
+        // Not just `!popover`: wire:navigate REPLACES the body, so a popover built on the
+        // previous one is still referenced here while no longer being in the document. The
+        // calendar then opened inside an orphan node and nothing showed up on the page.
+        if (!popover || !document.body.contains(popover)) {
             popover = document.createElement('div');
             popover.className = 'wp-popover';
             popover.setAttribute('role', 'dialog');
