@@ -191,6 +191,18 @@ Pick the theme once on `<html>` (shared with the rest of the family):
 <html data-wire-theme="studio">
 ```
 
+## Your own field
+
+The calendar is this package's, the field is the application's. Dropped into a form, a trigger with its own background, border, radius and padding sits beside inputs that have different ones, and the control that does not match the rest is the one the eye catches.
+
+```blade
+<x-wirepicker wire:model="bornOn" trigger-class="my-input" />
+```
+
+The trigger then keeps only what it needs to work (the flex row for icon and text, the full width, the room for the clear button, the pointer) and loses background, border, radius, padding, colour and font size, so `my-input` draws it. Its focus ring goes too, because the host's `:focus` lands on that same button and two rings would stack.
+
+Without it the trigger is styled by the theme, which is right for a picker that stands on its own.
+
 The family's themes:
 
 | Theme | Vibe |

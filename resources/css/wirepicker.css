@@ -109,6 +109,33 @@
     cursor: pointer;
 }
 
+/*
+   `bare`: the field keeps its LAYOUT and loses its SKIN, so the host's own input class draws it.
+
+   The calendar is this package's, the field is the application's. Dropped into a form, a trigger
+   with its own background, border, radius and padding sits beside inputs that have different
+   ones, and the one control that does not match the rest is the one the eye catches. A theme
+   cannot fix that either: it would have to guess what the host's inputs look like.
+
+   What stays is what the component needs to work: the flex row for the icon and the text, the
+   full width, the room on the right for the clear button, and the pointer. What goes is
+   everything the host already decides for its own fields.
+*/
+.wp-trigger--bare {
+    padding: 0;
+    padding-right: 32px;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    color: inherit;
+    font-size: inherit;
+}
+
+/* And its focus ring: the host's `:focus` lands on the BUTTON, so leaving the package's inset
+   ring on would paint two. */
+.wp-trigger--bare:focus-visible,
+.wp-trigger--bare[aria-expanded="true"] { box-shadow: none; }
+
 .wp-picker[data-wp-size="sm"] .wp-trigger {
     padding: var(--wp-trigger-padding-sm);
     padding-right: 30px;

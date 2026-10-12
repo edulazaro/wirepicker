@@ -42,6 +42,16 @@ class TimePicker extends Component
         public string $size = 'md',
         ?string $locale = null,
         public ?string $id = null,
+
+        /**
+         * Your own class for the FIELD, which drops this package's skin from it.
+         *
+         * The calendar is this package's, the field is the application's. Dropped into a form,
+         * a trigger with its own background, border, radius and padding sits beside inputs that
+         * have different ones, and the control that does not match the rest is the one the eye
+         * catches. Pass the class your own inputs use and the trigger keeps only its layout.
+         */
+        public string $triggerClass = '',
     ) {
         $this->locale = str_replace('_', '-', $locale ?? app()->getLocale());
         $this->min = self::time($min);

@@ -29,7 +29,7 @@
             @unless ($model($attributes)) value="{{ is_array($value) ? ($value[$part] ?? '') : ($part === 'start' ? $value : '') }}" @endunless>
     @endforeach
 
-    <button type="button" class="wp-trigger" data-wp-trigger aria-haspopup="dialog" aria-expanded="false" @if ($id) id="{{ $id }}" @endif>
+    <button type="button" @class(['wp-trigger', 'wp-trigger--bare' => $triggerClass !== '', $triggerClass]) data-wp-trigger aria-haspopup="dialog" aria-expanded="false" @if ($id) id="{{ $id }}" @endif>
         <svg class="wp-trigger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
         {{-- wire:ignore: wirepicker.js paints this, and a morph must not paint it back. --}}
         <span class="wp-trigger-text" data-wp-display wire:ignore>{{ $labels()['placeholder'] }}</span>

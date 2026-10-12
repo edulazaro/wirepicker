@@ -18,7 +18,7 @@
         @if ($name) name="{{ $name }}" @endif
         @unless ($model($attributes)) value="{{ $value }}" @endunless>
 
-    <button type="button" class="wp-trigger" data-wp-trigger aria-haspopup="dialog" aria-expanded="false" @if ($id) id="{{ $id }}" @endif>
+    <button type="button" @class(['wp-trigger', 'wp-trigger--bare' => $triggerClass !== '', $triggerClass]) data-wp-trigger aria-haspopup="dialog" aria-expanded="false" @if ($id) id="{{ $id }}" @endif>
         <svg class="wp-trigger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
         <span class="wp-trigger-text" data-wp-display wire:ignore>{{ $labels()['placeholder'] }}</span>
     </button>
