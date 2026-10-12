@@ -838,3 +838,32 @@
     --wp-range: rgba(163, 230, 53, 0.16);
     --wp-hover: rgba(163, 230, 53, 0.1);
 }
+
+/* magic: midnight indigo, gold accent, parchment text, dark always (1:1 with wiremodal) */
+[data-wire-theme="magic"] {
+    --wire-bg: #1C1840;
+    --wire-bg-elevated: #221D4C;
+    --wire-accent: #C9A55C;
+    --wire-text: #EDE4D3;
+    --wire-text-muted: rgba(237, 228, 211, 0.6);
+    --wire-border: rgba(201, 165, 92, 0.22);
+    --wire-border-strong: rgba(201, 165, 92, 0.45);
+    --wire-radius: 10px;
+    --wire-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(201, 165, 92, 0.1);
+
+    /* The gold is light, so the day under the cursor takes the DARK text: parchment on gold is
+       unreadable, and it is the one day the eye goes to. */
+    --wp-accent-text: #1A1613;
+    --wp-range: rgba(201, 165, 92, 0.16);
+    --wp-hover: rgba(201, 165, 92, 0.1);
+}
+
+/* A serif title over a sans body, the one thing the palette alone cannot say. Named families
+   first and generics after: a theme cannot ship a font. */
+/* Y el popover tambien, que lleva su propio `data-wire-theme` porque se saca del flujo: sin esta
+   segunda mitad, el titulo del mes saldria en sans dentro del calendario abierto, que es justo
+   donde se lee. Es el mismo par que ya tiene synthwave mas arriba. */
+[data-wire-theme="magic"] .wp-title,
+.wp-popover[data-wire-theme="magic"] .wp-title {
+    font-family: "IM Fell English", "Iowan Old Style", Palatino, Georgia, serif;
+}
