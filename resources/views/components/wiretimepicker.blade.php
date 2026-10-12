@@ -2,7 +2,7 @@
     A time of day (H:i) in a hidden field, like the picker's dates: wire:model, a plain form or
     Alpine read it. wirepicker.js draws the list of times in the shared popover.
 --}}
-<div {{ $attributes->whereDoesntStartWith('wire:model')->merge(['class' => 'wp-picker']) }}
+<div {{ $attributes->whereDoesntStartWith('wire:model')->merge(['class' => 'wp-picker'.($triggerClass !== '' ? ' wp-picker--field' : '')]) }}
      data-wirepicker
      data-wp-mode="time"
      data-wp-size="{{ $size }}"

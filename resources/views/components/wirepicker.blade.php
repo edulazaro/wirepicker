@@ -3,7 +3,7 @@
     Alpine all read them.
     wirepicker.js draws the calendar and writes them back, firing `input` and `change`.
 --}}
-<div {{ $attributes->whereDoesntStartWith('wire:model')->merge(['class' => 'wp-picker']) }}
+<div {{ $attributes->whereDoesntStartWith('wire:model')->merge(['class' => 'wp-picker'.($triggerClass !== '' ? ' wp-picker--field' : '')]) }}
      data-wirepicker
      data-wp-mode="{{ $range ? 'range' : 'single' }}"
      data-wp-size="{{ $size }}"

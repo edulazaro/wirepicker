@@ -89,6 +89,21 @@
     font-family: var(--wp-font);
 }
 
+/*
+   With `trigger-class` this is a FIELD in somebody's form, so it takes a field's place: a block
+   that fills its column, under its label, like any input.
+
+   `inline-flex` is right for a picker standing on its own and wrong here: inline it sits beside
+   the label instead of under it, and with no width it shrinks to its content, so a date field
+   ends up a third of the width of the ones next to it. The package was deciding the layout of a
+   form it has never seen.
+*/
+.wp-picker--field {
+    display: block;
+    width: 100%;
+    font-family: inherit;
+}
+
 .wp-trigger {
     display: flex;
     align-items: center;
@@ -122,14 +137,20 @@
    everything the host already decides for its own fields.
 */
 .wp-trigger--bare {
-    padding: 0;
-    padding-right: 32px;
     border-radius: 0;
     background: none;
     box-shadow: none;
     color: inherit;
     font-size: inherit;
+
+    /* The padding is the HOST's, and that is the whole point: `padding: 0` here was what broke
+       it, leaving the text against the edge and the field shorter than the ones beside it. What
+       the package still needs is room on the right for the clear button, and that it asks for
+       without touching the padding. */
+    padding: inherit;
 }
+
+.wp-picker--field .wp-clear { right: 10px; }
 
 /* And its focus ring: the host's `:focus` lands on the BUTTON, so leaving the package's inset
    ring on would paint two. */
