@@ -919,6 +919,30 @@
     --wp-accent-text: #1A1613;
     --wp-range: rgba(201, 165, 92, 0.16);
     --wp-hover: rgba(201, 165, 92, 0.1);
+
+    /*
+       The FIELD, which a theme has to state and this one did not: without these the trigger took
+       `--wire-bg`, the panel's indigo, and sat in a form whose own inputs are that same indigo
+       with black over it. One violet control among them is the one the eye catches.
+
+       Square, because this palette has no rounded fields; the ink underneath rather than the
+       panel colour; the border a faint chalk; and the focus ring the gold, which is what its
+       inputs do.
+    */
+    --wp-trigger-bg: rgba(0, 0, 0, 0.28);
+    --wp-trigger-border: rgba(237, 228, 211, 0.22);
+    --wp-trigger-focus: var(--wire-accent);
+    --wp-trigger-radius: 0;
+    --wp-trigger-padding: 0.7rem 0.9rem;
+    --wp-trigger-padding-sm: 0.5rem 0.7rem;
+    --wp-trigger-font-size: 1rem;
+    --wp-trigger-text: var(--wire-text);
+    /* The placeholder in FULL text colour, not dimmed. A select in this palette shows its
+       default option at full strength, and an empty date field reading «Elegir fecha» is the
+       same thing: an instruction to read, not a value to tell apart from a real one. Dimmed it
+       was a whisper over the ink. */
+    --wp-trigger-placeholder: var(--wire-text);
+    --wp-trigger-icon: var(--wire-text);
 }
 
 /* A serif title over a sans body, the one thing the palette alone cannot say. Named families
@@ -926,6 +950,22 @@
 /* Y el popover tambien, que lleva su propio `data-wire-theme` porque se saca del flujo: sin esta
    segunda mitad, el titulo del mes saldria en sans dentro del calendario abierto, que es justo
    donde se lee. Es el mismo par que ya tiene synthwave mas arriba. */
+/* And the field is drawn exactly as this palette's inputs are: a real 1px border instead of an
+   inset shadow, and the inherited line height instead of 1.43, which is what made it taller than
+   the select beside it. The focus moves the border colour to the gold, like its inputs do. */
+[data-wire-theme="magic"] .wp-trigger {
+    border: 1px solid var(--wp-trigger-border);
+    box-shadow: none;
+    line-height: inherit;
+}
+
+[data-wire-theme="magic"] .wp-trigger:focus-visible,
+[data-wire-theme="magic"] .wp-trigger[aria-expanded="true"] {
+    border-color: var(--wire-accent);
+    box-shadow: none;
+    outline: none;
+}
+
 [data-wire-theme="magic"] .wp-title,
 .wp-popover[data-wire-theme="magic"] .wp-title {
     font-family: "IM Fell English", "Iowan Old Style", Palatino, Georgia, serif;
